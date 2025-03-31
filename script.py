@@ -7,15 +7,13 @@ JIRA_PASS = os.getenv('JIRA_PASS')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-# JQL и URL запроса
 jql = 'project=MS AND status=Open AND "Группа"="Контакт-Центр"'
-url = f'https://jirasd.saima.kg/rest/api/2/search?jql={requests.utils.quote(jql)}&maxResults=5'
+url = f'https://jirasd.saima.kg/rest/api/2/search?jql={requests.utils.quote(jql)}&maxResults=10'
 
 headers = {
     "Accept": "application/json"
 }
 
-# Храним уже отправленные ключи
 sent_file = "sent_issues.json"
 if os.path.exists(sent_file):
     with open(sent_file, "r") as f:
@@ -23,7 +21,6 @@ if os.path.exists(sent_file):
 else:
     sent = set()
 
-# Получаем задачи из JIRA
 response = requests.get(url, headers=headers, auth=(JIRA_USER, JIRA_PASS), verify=False)
 issues = response.json().get("issues", [])
 
@@ -40,6 +37,5 @@ for issue in issues:
         )
         sent.add(key)
 
-# Обновляем список
 with open(sent_file, "w") as f:
     json.dump(list(sent), f)
